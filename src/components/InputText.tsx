@@ -15,18 +15,12 @@ export const InputText = ({ focused, onChange, value }: Props) => {
     }
   }, [focused]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.currentTarget.value;
-
-    if (newValue === '') return;
-
-    onChange('WRITE', newValue);
-  };
-
-  const handleKeyboardDownCapture = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Backspace') return;
-
-    onChange('ERASE');
+  const handleKeyDown = ({ key }: KeyboardEvent<HTMLInputElement>) => {
+    if (key === 'Backspace') {
+      onChange('ERASE');
+    } else if (key.match(/[a-z]/)) {
+      onChange('WRITE', key);
+    }
   };
 
   return (
@@ -36,8 +30,7 @@ export const InputText = ({ focused, onChange, value }: Props) => {
       type="text"
       maxLength={1}
       value={value}
-      onChange={handleChange}
-      onKeyDownCapture={handleKeyboardDownCapture}
+      onKeyDown={handleKeyDown}
     />
   );
 };
