@@ -48,7 +48,6 @@ export const Verification = () => {
               key={index}
               focused={isFocused}
               onChange={handleChange}
-              value={verificationCode[index]}
             />
           );
         })}
