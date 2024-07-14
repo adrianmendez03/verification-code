@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, KeyboardEvent, useState } from 'react';
+import React, { useRef, useEffect, useState, ChangeEvent } from 'react';
 
 type Props = {
   focused: boolean;
@@ -15,14 +15,16 @@ export const InputText = ({ focused, onChange }: Props) => {
     }
   }, [focused]);
 
-  const handleKeyDown = ({ key }: KeyboardEvent<HTMLInputElement>) => {
-    if (key === 'Backspace') {
+  const handleChange = ({
+    target: { value },
+  }: ChangeEvent<HTMLInputElement>) => {
+    if (value.match(/[a-z]/)) {
+      onChange('WRITE', value);
+    } else if (value === '') {
       onChange('ERASE');
-      setValue('');
-    } else if (key.match(/[a-z]/)) {
-      onChange('WRITE', key);
-      setValue(key);
     }
+
+    setValue(value);
   };
 
   return (
@@ -32,7 +34,7 @@ export const InputText = ({ focused, onChange }: Props) => {
       type="text"
       maxLength={1}
       value={value}
-      onKeyDown={handleKeyDown}
+      onChange={handleChange}
     />
   );
 };
