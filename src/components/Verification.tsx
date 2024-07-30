@@ -1,37 +1,16 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
+import {
+  VERIFICATION_CODE_LENGTH,
+  PLACEHOLDER_VALUE,
+  findActiveIndex,
+} from './utils';
 import { InputText } from './InputText';
-
-const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
 
 const Row = styled.div`
   display: flex;
   flex-direction: row;
 `;
-
-const VERIFICATION_CODE_LENGTH = 6;
-const PLACEHOLDER_VALUE = '';
-
-const findActiveIndex = (
-  type: 'PUSH' | 'POP',
-  code: string[],
-  prevActiveIndex: number
-) => {
-  if (type === 'PUSH') {
-    return prevActiveIndex === VERIFICATION_CODE_LENGTH - 1
-      ? prevActiveIndex
-      : prevActiveIndex + 1;
-  }
-
-  if (code[prevActiveIndex] !== PLACEHOLDER_VALUE) {
-    return prevActiveIndex;
-  }
-
-  return prevActiveIndex === 0 ? 0 : prevActiveIndex - 1;
-};
 
 export const Verification = () => {
   const [code, setCode] = useState<string[]>(
@@ -60,22 +39,16 @@ export const Verification = () => {
   };
 
   return (
-    <Column>
-      <h1>2-Step Verification</h1>
-      <span>Enter the 2-step verification code we texted to your phone</span>
-      <label>Verification Code</label>
-      <p>{indexRef.current}</p>
-      <Row>
-        {code.map((_, index) => {
-          return (
-            <InputText
-              key={index}
-              focused={indexRef.current === index}
-              onChange={handleChange}
-            />
-          );
-        })}
-      </Row>
-    </Column>
+    <Row>
+      {code.map((_, index) => {
+        return (
+          <InputText
+            key={index}
+            focused={indexRef.current === index}
+            onChange={handleChange}
+          />
+        );
+      })}
+    </Row>
   );
 };
