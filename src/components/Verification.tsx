@@ -12,41 +12,65 @@ const Row = styled.div`
   flex-direction: row;
 `;
 
+const VERIFICATION_CODE_LENGTH = 6;
+const PLACEHOLDER_VALUE = '';
+
+const findActiveIndex = (
+  type: 'PUSH' | 'POP',
+  code: string[],
+  prevActiveIndex: number
+) => {
+  if (type === 'PUSH') {
+    return prevActiveIndex === VERIFICATION_CODE_LENGTH - 1
+      ? prevActiveIndex
+      : prevActiveIndex + 1;
+  }
+
+  if (code[prevActiveIndex] !== PLACEHOLDER_VALUE) {
+    return prevActiveIndex;
+  }
+
+  return prevActiveIndex === 0 ? 0 : prevActiveIndex - 1;
+};
+
 export const Verification = () => {
-  const [verificationCode, setVerificationCode] = useState<string>('');
+  const [code, setCode] = useState<string[]>(
+    new Array(VERIFICATION_CODE_LENGTH).fill(PLACEHOLDER_VALUE)
+  );
+  const indexRef = useRef(0);
 
-  const handleChange = (type: 'WRITE' | 'ERASE', value?: string) => {
-    let newCode = '';
+  const handleChange = (type: 'PUSH' | 'POP', value: string) => {
+    const newCode = code.map((char, index) => {
+      if (index === indexRef.current) {
+        switch (type) {
+          case 'PUSH':
+            return value;
+          case 'POP':
+          default:
+            return PLACEHOLDER_VALUE;
+        }
+      } else {
+        return char;
+      }
+    });
 
-    switch (type) {
-      case 'WRITE':
-        newCode = verificationCode + value;
-        break;
-      case 'ERASE':
-        newCode = verificationCode.slice(0, verificationCode.length - 1);
-        break;
-      default:
-        break;
-    }
+    indexRef.current = findActiveIndex(type, code, indexRef.current);
 
-    setVerificationCode(newCode);
+    setCode(newCode);
   };
 
   return (
     <Column>
-      <h1>2-step verifcation</h1>
-      <p>Enter the 2-step verification code we texted to your phone</p>
-      <label>Code</label>
+      <h1>2-Step Verification</h1>
+      <span>Enter the 2-step verification code we texted to your phone</span>
+      <label>Verification Code</label>
+      <p>{indexRef.current}</p>
       <Row>
-        {new Array(6).fill(null).map((_, index) => {
-          const activeIndex = verificationCode.length;
-          const isFocused =
-            activeIndex === index || (activeIndex === 6 && index === 5);
-
+        {code.map((_, index) => {
           return (
             <InputText
               key={index}
-              focused={isFocused}
+              focused={indexRef.current === index}
               onChange={handleChange}
             />
           );

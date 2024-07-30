@@ -1,8 +1,14 @@
-import React, { useRef, useEffect, useState, ChangeEvent } from 'react';
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  ChangeEvent,
+  KeyboardEvent,
+} from 'react';
 
 type Props = {
   focused: boolean;
-  onChange(type: 'WRITE' | 'ERASE', value?: string): void;
+  onChange(type: 'PUSH' | 'POP', value?: string): void;
 };
 
 export const InputText = ({ focused, onChange }: Props) => {
@@ -15,16 +21,16 @@ export const InputText = ({ focused, onChange }: Props) => {
     }
   }, [focused]);
 
-  const handleChange = ({
-    target: { value },
-  }: ChangeEvent<HTMLInputElement>) => {
-    if (value.match(/[a-z]/)) {
-      onChange('WRITE', value);
-    } else if (value === '') {
-      onChange('ERASE');
-    }
+  const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {};
 
-    setValue(value);
+  const handleValuePropagation = ({ key }: KeyboardEvent<HTMLInputElement>) => {
+    if (key === 'Backspace') {
+      onChange('POP');
+      setValue('');
+    } else if (key.match(/[a-z]/)) {
+      onChange('PUSH', key);
+      setValue(key);
+    }
   };
 
   return (
@@ -34,7 +40,8 @@ export const InputText = ({ focused, onChange }: Props) => {
       type="text"
       maxLength={1}
       value={value}
-      onChange={handleChange}
+      onChange={handleValueChange}
+      onKeyDownCapture={handleValuePropagation}
     />
   );
 };
